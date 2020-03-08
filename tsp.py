@@ -10,6 +10,7 @@ class Tour(object):
         self.cities = []
         self.num_city = 0
         self.adj_matrix = []
+        self.W = []
 
     def tour(self):
         self.storing_data()
@@ -46,6 +47,33 @@ class Tour(object):
                 self.adj_matrix = Graph(edge,self.cities[i],self.cities[j],distance)
                 self.adj_matrix.show_all()
                 edge += 1
+
+    #begining of find MST
+    def find(self,parent,rank,vertex):
+        if parent[vertex] == vertex:
+            return parent[vertex]
+        return self.find(parent, rank, parent[vertex])
+
+    def union(self,parent,rank,root1,root2):
+        if rank[root1] > rank[root2]:
+            parent[root2] = root1
+        elif rank[root2] > rank[root1]:
+            parent[root1]=root2
+        else:
+            parent[root1] = root2
+            rank[root2] +=1
+
+    def makeset(self,parent,rank,vertex):
+        parent[vertex] = vertex
+        rank[vertex] = 0
+
+    def MST(self):
+        A = []
+        rank = [-1 for i in range(self.num_city)] #disjoint set rank
+        parent = [-1 for i in range(self.num_city)] # disjoint set
+        for i in range(len(points)):
+            makeset(parent, rank,i)
+        #mergesort the lower triangle
 
 class City(object):
     def __init__(self,city_id,point):
