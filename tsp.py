@@ -12,9 +12,13 @@ class Tour(object):
         self.adj_matrix = []
         self.W = []
 
+    def get_adj_matrix(self,i,j):
+        return self.adj_matrix[i][j]
+
     def tour(self):
         self.storing_data()
         self.create_graph()
+        self.MST()
 
     def storing_data(self):
         # reading the files
@@ -44,10 +48,45 @@ class Tour(object):
         for i in range(self.num_city):
             for j in range(self.num_city):
                 distance = self.distance(self.cities[i].point,self.cities[j].point)
-                self.adj_matrix = Graph(edge,self.cities[i],self.cities[j],distance)
-                self.adj_matrix.show_all()
+                self.adj_matrix[i][j] = Graph(edge,self.cities[i],self.cities[j],distance)
+                self.adj_matrix[i][j].show_all()
                 edge += 1
+        #make the lower triangle into one array
+        for i in range(self.num_city):
+            for j in range(self.num_city-(self.num_city-i)):
+                self.W.append(self.adj_matrix[i][j])
 
+
+    def mergesort(self,array):
+        if len(array) > 1:
+            mid = len(array) // 2
+            left = array[:mid]
+            right = array[mid:]
+            #divide
+            self.mergesort(left)
+            self.mergesort(right)
+
+            i = j = 0 #left and right
+            k = 0 # main array
+            #conquer
+            while i < len(left) and j < len(right):
+                if left[i].distance < right[j].distance:
+                    array[k] = left[i]
+                    i = i + 1
+                else:
+                    array[k] = right[j]
+                    j = j + 1
+                k = k + 1
+
+            while i < len(left):
+                array[k] = left[i]
+                i = i + 1
+                k = k + 1
+
+            while j < len(right):
+                array[k] = right[j]
+                j = j + 1
+                k = k + 1
     #begining of find MST
     def find(self,parent,rank,vertex):
         if parent[vertex] == vertex:
@@ -71,9 +110,40 @@ class Tour(object):
         A = []
         rank = [-1 for i in range(self.num_city)] #disjoint set rank
         parent = [-1 for i in range(self.num_city)] # disjoint set
-        for i in range(len(points)):
-            makeset(parent, rank,i)
+        for i in range(self.num_city):
+            self.makeset(parent, rank,i)
         #mergesort the lower triangle
+        self.mergesort(self.W)
+        for i in range(len(self.W)):
+            c1_index = c2_index = -1
+            for k in range(self.num_city):
+                for l in range(self.num_city):
+                    if self.W[i].c1 == self.adj_matrix[k][l].c1:#point at that index
+                        c1_index = self.adj_matrix[k][l].edge# node key value
+                        break
+
+            for k in range(self.num_city):
+                for l in range(self.num_city):
+                    if self.W[i].c2 == self.adj_matrix[k][l].c2:#point at that index
+                        c2_index = self.adj_matrix[k][l].edge
+                        break
+            print("c1_index: %s, c2_index: %s"%(c1_index,c2_index))
+            root1 = self.find(parent,rank,c1_index)
+            root2 = self.find(parent, rank,c2_index)
+            if root1 != root2:
+                A.append(W[i])#.key
+                self.union(parent, rank, root1,root2)
+
+        print("Edges in MST")
+        print("Point [x,y]         Distance")
+        total_distance =0
+        for i in range(len(A)):
+            A[i].format()
+            total_distance += A[i].distance
+        print("         Total distance %s"% total_distance)
+        #print("A: %s"% A)
+
+
 
 class City(object):
     def __init__(self,city_id,point):
@@ -82,13 +152,15 @@ class City(object):
 
 class Graph(object):
     def __init__(self,edge,c1,c2,distance):
-        self.edge = edge
+        self.edge = edge # key value
         self.c1 = c1 #object city
         self.c2 = c2 #object city
         self.distance = distance
 
     def show_all(self):
         print("distance: %s c1: %s c2: %s edge: %s" % (self.distance, self.c1.point, self.c2.point, self.edge))
+    def format(self):
+        print("%s - %s        %s"%(self.c1, self.c2, self.distance))
 
 def main():
     tour = Tour()
