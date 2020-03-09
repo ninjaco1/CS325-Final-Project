@@ -118,29 +118,29 @@ class Tour(object):
             c1_index = c2_index = -1
             for k in range(self.num_city):
                 for l in range(self.num_city):
-                    if self.W[i].c1 == self.adj_matrix[k][l].c1:#point at that index
-                        c1_index = self.adj_matrix[k][l].edge# node key value
+                    if self.W[i].c1 == self.adj_matrix[k][l].c1:#city id needs to be fix
+                        c1_index = self.adj_matrix[k][l].c1.city_id# node key value
                         break
 
             for k in range(self.num_city):
                 for l in range(self.num_city):
                     if self.W[i].c2 == self.adj_matrix[k][l].c2:#point at that index
-                        c2_index = self.adj_matrix[k][l].edge
+                        c2_index = self.adj_matrix[k][l].c2.city_id
                         break
             print("c1_index: %s, c2_index: %s"%(c1_index,c2_index))
             root1 = self.find(parent,rank,c1_index)
             root2 = self.find(parent, rank,c2_index)
             if root1 != root2:
-                A.append(W[i])#.key
+                A.append(self.W[i])#.key
                 self.union(parent, rank, root1,root2)
 
         print("Edges in MST")
-        print("Point [x,y]         Distance")
+        print("Point [x,y]                  Distance")
         total_distance =0
         for i in range(len(A)):
             A[i].format()
             total_distance += A[i].distance
-        print("         Total distance %s"% total_distance)
+        print("                           Total distance %s"% total_distance)
         #print("A: %s"% A)
 
 
@@ -155,12 +155,14 @@ class Graph(object):
         self.edge = edge # key value
         self.c1 = c1 #object city
         self.c2 = c2 #object city
+        # self.c1_id = c1_id
+        # self.c2_id = c2_id
         self.distance = distance
 
     def show_all(self):
         print("distance: %s c1: %s c2: %s edge: %s" % (self.distance, self.c1.point, self.c2.point, self.edge))
     def format(self):
-        print("%s - %s        %s"%(self.c1, self.c2, self.distance))
+        print("%s - %s      %s"%(self.c1.point, self.c2.point, self.distance))
 
 def main():
     tour = Tour()
