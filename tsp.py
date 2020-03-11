@@ -3,6 +3,8 @@
 import sys
 import math
 import random
+import time
+
 
 class Tour(object):
     def __init__(self):
@@ -16,19 +18,22 @@ class Tour(object):
         self.MST
         self.T = []
         self.total_edge = 0
+        self.output = self.text_name + ".tour"
 
     def get_adj_matrix(self,i,j):
         return self.adj_matrix[i][j]
 
     def tour(self):
-        self.storing_data()
-        self.create_graph()
+        self.storing_data()# read in file
+        start_time = time.time() #start the time
+        self.create_graph()# creating graph
         self.MST()#find MST
         odd_vertices = self.odd_vertices()# find all odd vertex
         print("Odd vertexes in MSTree: ")#,odd_vertices)
         for vertex in odd_vertices:
             print(vertex.point)
-        self.perfect_matching(odd_vertices)
+        self.perfect_matching(odd_vertices)# finding perfect matching
+        # print MST
         print("Edges in MST")
         print("Point [x,y]                  Distance")
         total_distance =0
@@ -37,6 +42,42 @@ class Tour(object):
             total_distance += self.MST[i].distance
         print("                           Total distance %s"% total_distance)
         #find euler tour
+        euler = self.euler_tour(self.MST)#euler stores city objects
+        print("e-tour: ")
+        for i in euler:# first and last would be the same
+            i.view()
+
+        #merge PM union euler
+        cur = euler[0] #start at the first city
+        tour_taken = [cur] #city objects
+        visited = [False] * len(euler) # set every city to false, since they are not visited
+        visited[0] = True
+        #calcultion for distance
+        distance = 0
+        for vertex in euler[1:]:
+            if not visited[vertex.city_id]:
+                tour_taken.append(vertex)
+                visited[vertex.city_id] = True
+
+                distance += self.adj_matrix[cur.city_id][vertex.city_id].distance
+                cur = vertex
+        tour_taken.append(tour_taken[0])
+        end_time = time.time() - start_time #end time
+
+
+        print ("tour distance: ", distance)
+        #print ("tour_taken: ",self.output)
+
+        #output to file
+        output_file = open(self.output,"w")
+        output_file.truncate(0) # delete everything in file
+        output_file.write(str(distance)+"\n")
+        for i in range(len(tour_taken)-1):
+            output_file.write(str(tour_taken[i].city_id)+"\n")
+        output_file.close()
+        print("time taken in seconds: ", end_time)
+
+
 
 
     def storing_data(self):
@@ -223,14 +264,49 @@ class Tour(object):
             self.total_edge +=1
             odd_vertices.remove(close)
 
-    def euler_tour(self):
-        pass
+    def euler_tour(self,MST):
+        # new added mst
+        #c1,c2,distance for mst
+        neighbors = {}
+        for edge in MST:
+            if edge.c1 not in neighbors:
+                neighbors[edge.c1] = []
+            if edge.c2 not in neighbors:
+                neighbors[edge.c2] = []
+
+            neighbors[edge.c1].append(edge.c2)
+            neighbors[edge.c2].append(edge.c1)
+
+        start = MST[0].c1
+        euler = [neighbors[start][0]]
+
+        while len(MST) > 0:
+            for i,v in enumerate(euler):
+                if len(neighbors[v]) > 0:
+                    break
+            while len(neighbors[v])> 0:
+                u = neighbors[v][0]
+                #delete edge from MST
+                for k,item in enumerate(MST):
+                    if(item.c1 == u and item.c2 == v) or (item.c1==v and item.c2 == u):
+                        del MST[k]
+
+                del neighbors[v][neighbors[v].index(u)]
+                del neighbors[u][neighbors[u].index(v)]
+                i = i+1
+
+                euler.insert(i,u)
+                v = u
+        return euler
 
 
 class City(object):
     def __init__(self,city_id,point):
         self.city_id = city_id # city number
         self.point = point #(x,y), where x is index 0 and y is index 1
+
+    def view(self):
+        print("city_id: %s, point: %s" %(self.city_id,self.point))
 
 class Graph(object):
     def __init__(self,edge,c1,c2,distance):
