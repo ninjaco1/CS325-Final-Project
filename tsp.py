@@ -29,23 +29,23 @@ class Tour(object):
         self.create_graph()# creating graph
         self.MST()#find MST
         odd_vertices = self.odd_vertices()# find all odd vertex
-        print("Odd vertexes in MSTree: ")#,odd_vertices)
-        for vertex in odd_vertices:
-            print(vertex.point)
+        # print("Odd vertexes in MSTree: ")#,odd_vertices)
+        # for vertex in odd_vertices:
+        #     print(vertex.point)
         self.perfect_matching(odd_vertices)# finding perfect matching
         # print MST
-        print("Edges in MST")
-        print("Point [x,y]                  Distance")
+        # print("Edges in MST")
+        # print("Point [x,y]                  Distance")
         total_distance =0
         for i in range(len(self.MST)):
-            self.MST[i].format()
+            # self.MST[i].format()
             total_distance += self.MST[i].distance
-        print("                           Total distance %s"% total_distance)
+        # print("                           Total distance %s"% total_distance)
         #find euler tour
         euler = self.euler_tour(self.MST)#euler stores city objects
-        print("e-tour: ")
-        for i in euler:# first and last would be the same
-            i.view()
+        # print("e-tour: ")
+        # for i in euler:# first and last would be the same
+        #     i.view()
 
         #merge PM union euler
         cur = euler[0] #start at the first city
@@ -88,11 +88,11 @@ class Tour(object):
 
         for num in range(len(lines)):
             self.int_string.append([int(i) for i in lines[num].split() if i.isdigit()])
-        print (self.int_string)
+        # print (self.int_string)
 
         for i in range(len(self.int_string)):
             self.cities.append(City(self.int_string[i][0],self.int_string[i][1:]))
-            print("city_id = %s  coordinate: %s "% (self.cities[i].city_id, self.cities[i].point))
+            #print("city_id = %s  coordinate: %s "% (self.cities[i].city_id, self.cities[i].point))
 
     def distance(self,c1,c2):
         #x=[0] y=[1]
@@ -110,7 +110,7 @@ class Tour(object):
             for j in range(self.num_city):
                 distance = self.distance(self.cities[i].point,self.cities[j].point)
                 self.adj_matrix[i][j] = Graph(edge,self.cities[i],self.cities[j],distance)
-                self.adj_matrix[i][j].show_all()
+                # self.adj_matrix[i][j].show_all()
                 edge += 1
         #make the lower triangle into one array
         for i in range(self.num_city):
@@ -200,13 +200,13 @@ class Tour(object):
                 self.union(parent, rank, root1,root2)
                 #line_number +=1
 
-        print("Edges in MST")
-        print("Point [x,y]                  Distance")
-        total_distance =0
-        for i in range(len(A)):
-            A[i].format()
-            total_distance += A[i].distance
-        print("                           Total distance %s"% total_distance)
+        # print("Edges in MST")
+        # print("Point [x,y]                  Distance")
+        # total_distance =0
+        # for i in range(len(A)):
+        #     A[i].format()
+        #     total_distance += A[i].distance
+        # print("                           Total distance %s"% total_distance)
 
         '''
         self.adj_list = [[] for i in range(self.num_city)]
